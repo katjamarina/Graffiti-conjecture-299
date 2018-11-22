@@ -75,7 +75,7 @@ kjer je $S$ množica vozlišč, ki imajo stopnjo 2.
 
 \section{\textbf{Načrt dela}}
 
-Delo sva začela s pisanjem pomožnih funkcij, ki so nama v nadaljevanju pomagale pri glavni funkciji za testiranje hipoteze. Funkcija na koncu vrne, ali je bila domneva ovržena, ali pa jo potrdi. (Delo bova začela s pisanjem programa, ki bo sam zgeneriral vse možne enostavne povezane grafe stopnje $n$ (za majhne $n$). Za vsakega bo pogledal, ali opisana domneva drži, ali pa jo bo ovrgel. Če bo domneva držala za vse manjše grafe, se bova lotila iskanja protiprimera na večjih grafih, za katere je težko ugotoviti totalno dominantno množico, zato se bova tega lotila z eno od populacijskih metahevrističnih metod, kot je npr. \textit{ant colony optimization}.) 
+Delo sva začela s pisanjem pomožnih funkcij, ki so nama v nadaljevanju pomagale pri glavni funkciji za testiranje hipoteze. Funkcija na koncu vrne, ali je bila domneva ovržena, ali pa jo potrdi. Vendar pa ta program učinkovito deluje le za (približno) $n \in \{1, 2, ..., 8\}$ zaradi časovne zahtevnosti, zato sva se lotila iskanja protiprimera z eno od populacijskih metahevrističnih metod, in sicer z genetskim algoritmom. 
 
 \section{\textbf{Primer}}
 
@@ -141,7 +141,7 @@ def annihilation(G):
 \end{verbatim}
 
 \subsection{\textbf{total\_domination\_number(G))}}
-Naslednja pomožna funkcija je \textit{total\_domination\_number(G)}, ki z mešanim celoštevilskim linearnim programom izračuna totalno dominantno število grafa. 
+Naslednja pomožna funkcija je \textit{total\_domination\_number(G)}, ki z mešanim celoštevilskim linearnim programom izračuna totalno dominantno število grafa. Pri tem sva ločila še primer, ko ima graf samo eno vozlišče in ima totalno dominantno število 0, in pa primer, ko sta vozlišči dve, kjer je totalno dominantno število 1.
 
 \begin{verbatim}
 def total_domination_number(G):
@@ -165,10 +165,10 @@ Vse pomožne funkcije, ki sva jih definirala, na koncu združiva v funkciji \tex
 \begin{spverbatim}
 def testiranje_domneve(n):
     grafi = list(graphs.nauty_geng(str(n)+" -c"))
-    for graf in range(len(grafi)):
-        if total_domination_number(grafi[graf]) > (annihilation(grafi[graf])) + (powerset_S(grafi[graf])):
-            show(grafi[graf])
-            print(annihilation(grafi[graf]))
+    for graf in grafi:
+        if total_domination_number(graf) > (annihilation(graf)) + (powerset_S(graf)):
+            show(graf)
+            print(annihilation(graf))
             return ("Domneva je ovrzena.")
     return "Domneva ni ovrzena."
 \end{spverbatim}
