@@ -1,0 +1,180 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[slovene]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{nopageno}
+\usepackage{lmodern}
+\usepackage{eurosym}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{spverbatim}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\vspace{1cm}
+\Huge 
+\textbf{Graffiti conjecture 299}
+
+\vspace{0,5cm}
+\Large
+\textbf{Poročilo projekta}
+
+\vspace{0,5cm}
+\large
+Projekt v povezavi s predmetom Operacijske raziskave
+
+
+\vspace{2cm}
+\large
+Avtorja:\\
+\textbf{Stefan Đekanović, Katja Marina}
+
+\vfill
+
+\Large Ljubljana, november 2018
+\end{center}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+
+\newpage
+\section{\textbf{Opis projekta}}
+
+Graffiti je računalniški program, ki programira grafsko-teoretične domneve. Program pozna določene grafe in je sposoben ovrednotiti določene formule oblikovane iz teoretičnih invariant grafov.  Če nobeden od grafov, s katerimi je seznanjen Graffiti, ni protiprimer za formulo, to formulo imenujemo domneva. Glavni problem je število teh domnev, še posebej tistih, ki so trivialne. 
+
+\noindent Najin projekt je testiranje domneve 299, ki pravi:
+
+\vspace{0,5cm}
+Če je $G$ enostaven povezan graf, potem je 
+
+\begin{align*}
+ g_t (G) \leq Annihilation(G) + |S|,
+\end{align*}
+
+kjer je $S$ množica vozlišč, ki imajo stopnjo 2. 
+
+\section{\textbf{Definicije}}
+
+\begin{itemize}
+ 	\item Graf $G$ je \textit{povezan}, če za poljubni vozlišči $u,v \in G$ obstaja pot od u do v.
+	\item Graf $G$ je \textit{enostaven}, če nima zank (začetna točka ni tudi njena končna točka) in vzporednih povezav (povezavi, ki imata skupno začetno in končno točko). 
+	\item \textit{Dominantna množica} oziroma \textit{dominating set} je podmnožica vozlišč grafa $G$, za katero velja, da dominira vse ostale točke v grafu.  Točka v grafu dominira drugo točko, če sta enaki, ali pa sta med seboj povezani (sosedni). 
+           \item \textit{Totalna dominantna množica} oziroma \textit{total dominanting set} $D(G)$ grafa $G$ je dominantna množica vozlišč grafa $G$, v kateri ima vsako vozlišče iz dominantne množice tudi vsaj enega soseda iz te množice.
+           \item \textit{Moč totalne dominantne množice} označimo z  $g_t (G)$.
+           \item \textit{Totalno dominantno število grafa} $G$ je moč najmanjše totalne dominantne množice grafa. 
+           \item \textit{Stopnja točke} v neusmerjenem grafu $G$ je število vseh njenih sosednih točk.
+           \item \textit{Annihilation(G)} oziroma »uničenje« grafa G – $A(G)$ definiramo tako: Naj ima graf $G$ n vozlišč in naj bo $d_1,d_2, ...,d_n$ nepadajoče zaporedje stopenj grafa $G$. $A(G)$ je največje celo število k, da je vsota prvih k členov zaporedja največ  $\frac{(d_1 + d_2+ ... + d_n)}{2}$.
+
+\end{itemize}
+
+\section{\textbf{Načrt dela}}
+
+Delo sva začela s pisanjem pomožnih funkcij, ki so nama v nadaljevanju pomagale pri glavni funkciji za testiranje hipoteze. Funkcija na koncu vrne, ali je bila domneva ovržena, ali pa jo potrdi. (Delo bova začela s pisanjem programa, ki bo sam zgeneriral vse možne enostavne povezane grafe stopnje $n$ (za majhne $n$). Za vsakega bo pogledal, ali opisana domneva drži, ali pa jo bo ovrgel. Če bo domneva držala za vse manjše grafe, se bova lotila iskanja protiprimera na večjih grafih, za katere je težko ugotoviti totalno dominantno množico, zato se bova tega lotila z eno od populacijskih metahevrističnih metod, kot je npr. \textit{ant colony optimization}.) 
+
+\section{\textbf{Primer}}
+
+Prikazala bova primer testiranja domneve na manjšem enostavnem povezanem grafu s 5 vozlišči.
+
+\vspace{0,5cm}
+\begin{center}
+\includegraphics[scale=0.6]{graf}
+
+\vspace{0,5cm}
+\begin{gather*}
+S = \{1, 2, 3\} \Rightarrow |S| = 3 \\
+g_t(G) = |\{3, 5\}| = 2 \\
+d_1 \leq d_2 \leq d_3 < d_4 < d_5: \\
+d_1 = 2, d_2 = 2, d_3 = 2, d_4 = 3, d_5 = 3 \\
+\frac{d_1 + d_2 + d_3 + ... + d_5}{2} = \frac{2+2+2+3+3}{2} = 6 \\
+d_1 + d_2 + d_3 = 6 \Rightarrow k = 3, \text{torej je } A(G) = 3. 
+\end{gather*}
+
+\vspace{0.5cm}
+Najina domneva pravi: \\
+\vspace{0.5cm}
+$2 \leq 3 + 3 = 6$, torej v tem primeru drži. \\
+\end{center}
+
+\section{\textbf{Pomožne funkcije}}
+Najina enačba je sestavljena iz treh spremenljivk, ki jih bova izračunala s pomočjo pomožnih funkcij. 
+
+\subsection{\textbf{degrees(G)}}
+Najprej sva definirala funkcijo, ki vrne seznam vozlišč grafa, s katero si bova pomagala pri računanju \textit{annihilation(G)}.
+
+\begin{verbatim}
+def degrees(G):
+    stopnje = G.degree_sequence()
+    return stopnje
+\end{verbatim}
+
+\subsection{\textbf{powerset\_S}}
+Druga pomožna funkcija se imenuje \textit{powerset\_S}, ki iz seznama stopenj vozlišč vrne število vozlišč stopnje 2.
+
+\begin{verbatim}
+def powerset_S(G):
+    velikost_S = degrees(G).count(2)
+    return velikost_S
+\end{verbatim}
+
+\subsection{\textbf{annihilation(G))}}
+Funkcija \textit{annihilation(G)} najprej vzame seznam stopenj vozlišč, in ga obrne, tako da so v naraščajočem zaporedju. Potem izračuna polovično vsoto vseh stopenj, kar rabimo v nadeljevanju funkcije. Z zanko for se sprehodimo po naraščajočem seznamu stopenj, in ko je vsota i-tih stopenj še manjša ali pa enaka polovični vsoti stopenj, vrne število i. 
+
+\begin{verbatim}
+def annihilation(G):
+    stopnje = degrees(G)
+    stopnje_obr = stopnje[::-1]
+    vel = int(sum(stopnje_obr)/2)
+    sest = 0
+    if stopnje_obr == [0]: 
+        return 1
+    else:
+        for i, k in enumerate(stopnje_obr):
+            sest += k
+            if sest > vel:
+                return i
+\end{verbatim}
+
+\subsection{\textbf{total\_domination\_number(G))}}
+Naslednja pomožna funkcija je \textit{total\_domination\_number(G)}, ki z mešanim celoštevilskim linearnim programom izračuna totalno dominantno število grafa. 
+
+\begin{verbatim}
+def total_domination_number(G):
+    if len(G.vertices()) == 1:
+        return 0
+    p = MixedIntegerLinearProgram(maximization = False)
+    b = p.new_variable(binary = True)
+    p.set_objective( sum([b[v] for v in G]) )
+
+    for u in G:
+        p.add_constraint( sum([b[v] for v in G[u]]) >= 1 )
+
+    p.solve()
+    b = p.get_values(b)
+    return len([v for v,i in b.items() if i])
+\end{verbatim}
+
+\section{\textbf{Glavna funkcija}}
+Vse pomožne funkcije, ki sva jih definirala, na koncu združiva v funkciji \textit{testiranje\_domneve}, ki deluje za majhne grafe, do približno n = 8. Če za n vstaviva večje število, najin algoritem deluje počasneje zaradi velike časovne zahtevnosti. 
+
+\begin{spverbatim}
+def testiranje_domneve(n):
+    grafi = list(graphs.nauty_geng(str(n)+" -c"))
+    for graf in range(len(grafi)):
+        if total_domination_number(grafi[graf]) > (annihilation(grafi[graf])) + (powerset_S(grafi[graf])):
+            show(grafi[graf])
+            print(annihilation(grafi[graf]))
+            return ("Domneva je ovrzena.")
+    return "Domneva ni ovrzena."
+\end{spverbatim}
+
+\section{\textbf{Iskanje protiprimera}}
+Glavna funkcija v nobenem primeru ne ovrže, zato se morava problema lotiti še drugače, to pa je z uporabo metahevristike, bolj natančno populacijske metode. V njej bova uporabila tudi pomožne funkcije od prej. Zaradi zahtevnosti pa ni zagotovljeno, da bova protiprimer našla.
+
+
+\end{document}
