@@ -2,7 +2,6 @@
 \usepackage[slovene]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{nopageno}
 \usepackage{lmodern}
 \usepackage{eurosym}
 \usepackage{amssymb}
@@ -173,8 +172,41 @@ def testiranje_domneve(n):
     return "Domneva ni ovrzena."
 \end{spverbatim}
 
-\section{\textbf{Iskanje protiprimera}}
-Glavna funkcija v nobenem primeru ne ovrže, zato se morava problema lotiti še drugače, to pa je z uporabo metahevristike, bolj natančno populacijske metode. V njej bova uporabila tudi pomožne funkcije od prej. Zaradi zahtevnosti pa ni zagotovljeno, da bova protiprimer našla.
+\section{\textbf{Genetski algoritem za iskanje protiprimera}}
+Glavna funkcija v nobenem primeru ne ovrže, za število vozlišč $n \geq 9$ (približno) pa je bistveno prepočasna in neučinkovita, zato se morava problema lotiti še drugače, to pa je z uporabo metahevristike, bolj natančno populacijske metode.
+\newline
 
+\noindent Genetski algoritem temelji na ideji evolucije in naravne selekcije. Če hoče populacija preživeti, se mora konstantno izboljševati in prilagajati okolju. Poleg močnejših osebkov v populaciji mora preživeti tudi nekaj slabih, saj se s tem ohranja raznolikost. V našem primeru jo nujno potrebujemo, saj lahko brez raznolikosti v populaciji hitro skonvergiramo k lokalni rešitvi. S tem, da tudi nekaj slabih osebkov preživi, in se naprej razmnožujejo, torej zagotovimo, da pridemo s časom do globalne rešitve. 
+\newline
+
+\noindent Najprej določimo velikost vsake generacije in število vozlišč grafa, nato pa začnemo s prvo generacijo, kjer osebke (grafe) določimo naključno s funkcijo $graphs.randomGNP$ . Funkcija $ graphs.randomGNP$ zahteva še argument $p$, ki nam pove, s kakšno verjetnostjo naj bojo vozlišča povezana. Fitnes vsakega grafa določimo preko hipoteze s funkcijo $fitness(G)$:
+$$ 0 \leq annihilation(G) + |S| - g_t(G) $$
+$$ fitness(G) = annihilation(G) + |S| - g_t(G) $$
+Boljši graf je torej tisti, ki je bližji številu 0. Če najdemo graf s fitnesom manjšim od 0, je naša domneva ovržena. Ta graf pa je globalna rešitev problema. Ko vsakemu osebku določimo fitnes, izberemo za razmnoževanje najboljše osebke. Poleg teh pa naključno določimo še nekaj slabih osebkov, da ohranimo raznolikost v populaciji. 
+\newline
+
+\noindent Nato sledi proces razmnoževanja in mutacije. Najprej izberemo osebke, ki bodo ustvarili potomce. Osebek je lahko v procesu izbran večkrat. Večjo verjetnost za izbiro imajo osebki z močnejšim fitnesom. Pri vsakem razmnoževanju se določi en potomec, ki ga dodamo k naši populaciji. Kolikokrat pride do razmnoževanja osebkov v populaciji nam določi Poissonov proces.
+\newline
+ 
+\noindent \textbf{Primer:} Simulacija Poissonovega procesa s časom $t = 50$ in intenzivnostjo $ \lambda = 1/2 $, kjer je 50 velikost populacije.
+
+\begin{center}
+ [11, 14, 15, 17, 18, 18, 18, 18, 19, 19, 19, 20, 20, 20, 20, 20, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 24, 24, 24, 24, 24, 24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 26, 26, 26, 26, 27, 27, 27, 27, 27, 27, 27, 27, 28, 28, 28, 28, 28, 28, 28, 29, 29, 29, 29, 30, 30, 30, 30, 30, 30, 30, 31, 31, 31, 31, 31, 31, 32, 32, 33, 33, 33, 33, 34, 34, 36, 36, 37]
+\end{center}
+
+\noindent Po “crossoverju” je pomembno še, da pride do mutacije nekaterih osebkov. To nam zagotovi še večjo raznolikost v populaciji. Naključno izberemo nekaj osebkov in jih “mutiramo” tako, da jim dodamo ali odstranimo povezave. Želimo si, da je mutacij, kjer odstranimo/dodamo samo eno povezavo, največ. Sledijo mutacije z dvema povezavama, še redkeje so mutacije s tremi povezavami itd. Pri tem nam pomaga Poissonov proces s časom $t = 1$.
+\newline
+
+\noindent \textbf{Primer:} Simulacija Poissonovega procesa s časom $ t = 1 $ in intenzivnostjo $ \lambda = 1/2 $.
+
+\begin{center}
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+\end{center}
+
+\noindent Na tem koraku imamo v populaciji zaradi novih potomcev več osebkov kot na začetku, kjer so sedaj nekateri osebki tudi mutirani.
+Ko celoten postopek ponovimo, se populacija zmanjša na začetno velikost, saj za preživetje in razmnoževanje spet izberemo najboljše in nekaj naključno pridobljenih osebkov. V tej populaciji so sedaj osebki, ki so bližje naši rešitvi problema. 
+
+\section{\textbf{Zaključek in ugotovitve}}
+\noindent Vse funkcije sva združila v funkcijo $testGA$, ki za parametre vzame število vozlišč $n$, velikost populacije $pop\_size$, poljubno izbrano število najboljših za reprodukcijo $best$ in pa število generacij, torej $stevilo\_generacij$. Funkcija sproti prikazuje fitnes populacije za vsako generacijo, urejen po vrsti od najboljšega do najslabšega. Tako kot funkcija $testiranje\_domneve$ vrne, ali je domneva ovržena, in smo našli primer, ali pa ni. Ker pa z večkratnim testiranjem nisva dobila nobenega fitnesa manjšega od 0, protiprimera nisva našla, in ga tudi ne bova.
 
 \end{document}
